@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Notes App</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+    button { padding: 10px 15px; margin-right: 10px; cursor: pointer; border: none; border-radius: 5px; }
+    .save { background: green; color: white; }
+    .delete { background: red; color: white; }
+    .note { background: #eee; padding: 10px; margin-top: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Notes App</h2>
+    <textarea id="noteInput" placeholder="Write your note here..."></textarea><br>
+    <button class="save" onclick="saveNote()">Save</button>
+    <button class="delete" onclick="deleteAll()">Delete All</button>
+
+    <h3>Your Notes:</h3>
+    <div id="notesList"></div>
+  </div>
+
+  <script>
+    // Run this when the page loads
+    window.onload = showNotes;
+
+    // Save a new note
+    function saveNote() {
+      let text = document.getElementById("noteInput").value;
+
+      if (text.trim() === "") {
+        alert("Please write something!");
+        return;
+      }
+
+      // Get saved notes (if none, use empty array [])
+      let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+      // Add the new note
+      notes.push(text);
+
+      // Save back to localStorage
+      localStorage.setItem("notes", JSON.stringify(notes));
+
+      // Clear input box
+      document.getElementById("noteInput").value = "";
+
+      // Show updated notes
+      showNotes();
+    }
+
+    // Show all notes
+    function showNotes() {
+      let notes = JSON.parse(localStorage.getItem("notes")) || [];
+      let notesList = document.getElementById("notesList");
+
+      // Clear old notes before showing again
+      notesList.innerHTML = "";
+
+      // Loop through notes and display them
+      for (let i = 0; i < notes.length; i++) {
+        let div = document.createElement("div");
+        div.className = "note";
+        div.innerHTML = notes[i] + 
+          ` <button class="delete" onclick="deleteNote(${i})">Delete</button>`;
+        notesList.appendChild(div);
+      }
+    }
+
+    // Delete one note
+    function deleteNote(index) {
+      let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+      // Remove the note at given position
+      notes.splice(index, 1);
+
+      // Save updated notes
+      localStorage.setItem("notes", JSON.stringify(notes));
+
+      // Show updated notes
+      showNotes();
+    }
+
+    // Delete all notes
+    function deleteAll() {
+      if (confirm("Are you sure you want to delete everything?")) {
+        localStorage.removeItem("notes");
+        showNotes();
+      }
+    }
+  </script>
+</body>
+</html>
